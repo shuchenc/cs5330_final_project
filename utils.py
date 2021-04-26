@@ -18,15 +18,13 @@ def getContours(img, cThr=[100, 300], showCanny=False, minArea=1000, draw=False)
     lowerBlue = np.array([100, 100, 0], np.uint8)
     upperBlue = np.array([140, 250, 255], np.uint8)
     imgBlue = filterColor(img, lowerBlue, upperBlue)
-    imgBlur = cv2.GaussianBlur(imgBlue, (25, 25), 1)
+    imgBlur = cv2.GaussianBlur(imgBlue, (5, 5), 1)
     imgCanny = cv2.Canny(imgBlur, cThr[0], cThr[1])
-    kernel = np.ones((5, 5))
+    kernel = np.ones((10, 10))
     imgDilation = cv2.dilate(imgCanny, kernel=kernel, iterations=3)
-    imgThresh = cv2.erode(imgDilation, kernel=kernel, iterations=2)
-    if showCanny:
-        cv2.imshow('Canny', imgThresh)
+    imgThresh = cv2.erode(imgDilation, kernel=kernel, iterations=3)
 
-    img2, contours, hierachy = cv2.findContours(imgThresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    img2, contours, hierarchy = cv2.findContours(imgThresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_TC89_L1)
     finalContours = []
     for i in contours:
         area = cv2.contourArea(i)
@@ -40,8 +38,11 @@ def getContours(img, cThr=[100, 300], showCanny=False, minArea=1000, draw=False)
     if draw:
         for con in finalContours:
             cv2.drawContours(img, con[4], -1, (0, 0, 255), 3)
+            cv2.drawContours(imgThresh, con[4], -1, (0, 0, 255), 3)
             for p in con[2]:
                 cv2.drawMarker(img, (p[0, 0], p[0, 1]), (0, 200, 0), markerType=cv2.MARKER_TRIANGLE_DOWN)
+    if showCanny:
+        cv2.imshow('Canny', imgThresh)
     return img, finalContours
 
 
@@ -57,10 +58,14 @@ def reorder4Corners(points):
     return pointsNew
 
 
-def warpImg(img, points, w, h):
+def warpImg(img, points, w, h, prevMatrix=np.zeros((3, 3)), prevWeight=0):
     reorderedPoints = reorder4Corners(points)
     pts1 = np.float32(reorderedPoints)
     pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
     matrix = cv2.getPerspectiveTransform(pts1, pts2)
-    imgWarp = cv2.warpPerspective(img, matrix, (w, h))
-    return imgWarp
+    if prevMatrix.any():
+        newMatrix = matrix * 1/(1+prevWeight) + prevMatrix * prevWeight/(1+prevWeight)
+    else:
+        newMatrix = matrix
+    imgWarp = cv2.warpPerspective(img, newMatrix, (w, h))
+    return imgWarp, newMatrix

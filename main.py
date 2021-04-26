@@ -11,6 +11,9 @@ wTable = 54  # inches
 hTable = 108  # inches
 scale = 4
 
+warpMatrix = np.zeros((3, 3))
+curWeight = 0
+
 while cap.isOpened():
     if stream:
         success, img = cap.read()
@@ -25,13 +28,16 @@ while cap.isOpened():
     if len(contours) != 0:
         contourMax = contours[0]
         approxCorners = contourMax[2]
-        imgWarp = utils.warpImg(img, approxCorners, wTable * scale, hTable * scale)
+        imgWarp, newMatrix = utils.warpImg(img, approxCorners, wTable * scale, hTable * scale,
+                                           prevMatrix=warpMatrix, prevWeight=curWeight)
+        warpMatrix = newMatrix
+        curWeight += 1
         cv2.imshow('Warped Table', imgWarp)
 
     cv2.imshow('Original', img)
     img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 
-    k = cv2.waitKey(25)
+    k = cv2.waitKey(25) or 0xff
     if k == ord('q') or k == 27:
         break
     if k == ord('p') or k == 32:  # pause/play the video
