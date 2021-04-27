@@ -104,6 +104,7 @@ while cap.isOpened():
     img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 
     img = detection.detectBall(img, 'red')
+    img = detection.detectBall(img, 'yellow')
     # img = detection.detectBall(img, 'desk')
 
     cv2.imshow('Original', img)
