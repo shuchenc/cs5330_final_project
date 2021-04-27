@@ -85,7 +85,8 @@ def getContours(img, cThr=(100, 300), showCanny=False, minArea=1000, draw=False)
             # for p in con[5]:
             #     cv2.drawMarker(img, (p[0, 0], p[0, 1]), (20, 200, 200), markerType=cv2.MARKER_TILTED_CROSS)
     if showCanny:
-        cv2.imshow('Canny', imgThresh)
+        cv2.imshow('Blue surface', imgBlue)
+        cv2.imshow('Canny after dilation and erosion', imgThresh)
     return img, finalContours
 
 

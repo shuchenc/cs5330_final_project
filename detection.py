@@ -15,7 +15,7 @@ balls = {
     'yellow': {'range': [np.array([18, 109, 0]), np.array([40, 255, 254])], 'pts': deque(maxlen=mybuffer)},
     'white': {'range': [np.array([18, 0, 0]), np.array([120, 117, 255])], 'pts': deque(maxlen=mybuffer)},
     # following colors not working, too much noisy
-    'green': {'range': [np.array([29, 86, 6]), np.array([64, 255, 255])], 'pts': deque(maxlen=mybuffer)},
+    'green': {'range': [np.array([75, 100, 36]), np.array([96, 255, 255])], 'pts': deque(maxlen=mybuffer)},
     'blue': {'range': [np.array([107, 174, 0]), np.array([135, 255, 84])], 'pts': deque(maxlen=mybuffer)},
     'pink': {'range': [np.array([114, 36, 148]), np.array([179, 149, 255])], 'pts': deque(maxlen=mybuffer)},
 }
