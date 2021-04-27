@@ -5,36 +5,23 @@ from collections import deque
 path = 'test-1.png'
 # path = 'greenball.png'
 
-# 初始化追踪点的列表
+# initial tracking point list
 mybuffer = 16
 
-# 设定阈值，HSV空间
+# set HSV Threshold and initial tracking queue for each color
 balls = {
     'desk': {'range': [np.array([97, 121, 0]), np.array([180, 255, 255])], 'pts': deque(maxlen=mybuffer)},
     'red': {'range': [np.array([150, 150, 50]), np.array([180, 255, 180])], 'pts': deque(maxlen=mybuffer)},
     'yellow': {'range': [np.array([18, 109, 0]), np.array([40, 255, 254])], 'pts': deque(maxlen=mybuffer)},
     'white': {'range': [np.array([18, 0, 0]), np.array([120, 117, 255])], 'pts': deque(maxlen=mybuffer)},
-    # following colors not working, too much noisy
     'green': {'range': [np.array([70, 100, 36]), np.array([96, 255, 255])], 'pts': deque(maxlen=mybuffer)},
+    # following colors not working, too much noisy
     'blue': {'range': [np.array([107, 174, 0]), np.array([135, 255, 84])], 'pts': deque(maxlen=mybuffer)},
     'pink': {'range': [np.array([114, 36, 148]), np.array([179, 149, 255])], 'pts': deque(maxlen=mybuffer)},
 }
 
 
-def detectBalls(img, deskArea, color='red'):
-    img = cv2.medianBlur(img, 5)
-    cv2.imshow('medianblur', img)
-    diameterBall = 30
-    radiusBall = int(round(diameterBall / 2))
-    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 2 * radiusBall * 0.9,
-                               minRadius=int(round(radiusBall * 0.8)),
-                               maxRadius=int(round(radiusBall * 1.2)),
-                               param1=60,
-                               param2=20
-                               )
-    print(circles)
-
-
+# detect balls based on hsv color space
 def detectBall(frame, deskArea, color='red', showMask = False):
     # color space
     blurred = cv2.GaussianBlur(frame, (5, 5), 0)
@@ -65,7 +52,7 @@ def detectBall(frame, deskArea, color='red', showMask = False):
     # find contours in the mask and initialize the current
     # (x, y) center of the ball
     cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
-    # 初始化瓶盖圆形轮廓质心
+    # init centroid
     center = None
     # only proceed if at least one contour was found
     if len(cnts) > 0:

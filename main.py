@@ -115,7 +115,7 @@ while cap.isOpened():
                                       color=originalLineColor)
         cv2.imshow('Warped Table', imgWarp)
 
-    img, redPath = detection.detectBall(img, deskArea, 'red')
+    img, redPath = detection.detectBall(img, deskArea, 'red', True)
     img, yellowPath = detection.detectBall(img, deskArea, 'yellow')
     img, whitePath = detection.detectBall(img, deskArea, 'white')
     img, greenPath = detection.detectBall(img, deskArea, 'green')
