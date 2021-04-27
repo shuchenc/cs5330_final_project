@@ -120,11 +120,10 @@ while cap.isOpened():
     img, whitePath = detection.detectBall(img, deskArea, 'white')
     img, greenPath = detection.detectBall(img, deskArea, 'green')
     if whitePath is not None:
-        birdseyePoints.appendleft(whitePath)
+        # birdseyePoints.appendleft(whitePath)
         birdseyePointList.append(whitePath)
     for i in range(3, len(birdseyePointList)):
-        # if birdseyePointList[i - 1] is None or birdseyePointList[i] is None:
-        if i < 3:
+        if birdseyePointList[i - 1] is None or birdseyePointList[i] is None:
             continue
         if i % 3 == 0:
             cv2.line(img, birdseyePointList[i - 3], birdseyePointList[i], birdseyeLineColor)
