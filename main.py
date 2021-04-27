@@ -6,10 +6,10 @@ import detection
 stream = True
 
 path = 'sampleTable.jpg'
-path = 'youtube_game.png'
+# path = 'youtube_game.png'
 # cap = cv2.VideoCapture('all-balls.mp4')
 # cap = cv2.VideoCapture('red_ball_1.mp4')
-cap = cv2.VideoCapture('drill_fast.mp4')
+cap = cv2.VideoCapture('white_red_yellow_1.mp4')
 
 cap.set(3, 608)  # set width
 cap.set(4, 1080)  # set height
@@ -34,6 +34,9 @@ originalLineColor = (200, 200, 0)
 mouseX = -1
 mouseY = -1
 
+redPath, yellowPath, whitePath = [], [], []
+ballPathsToDraw = [redPath, yellowPath, whitePath]
+ballPathsColors = [(0, 0, 200), (0, 200, 200), (240, 240, 240)]
 
 def printXY(event, x, y, flags, param):
     global mouseY, mouseX, toDrawLists
@@ -71,7 +74,6 @@ while cap.isOpened():
         print("Can't receive frame. Exiting...")
         break
 
-
     frame_counter += 1
     # If the last frame is reached, reset the capture and the frame_counter
     if frame_counter == cap.get(cv2.CAP_PROP_FRAME_COUNT):
@@ -88,6 +90,15 @@ while cap.isOpened():
         deskArea = approxCorners
         imgWarp, newMatrix = utils.warpImg(img, approxCorners, wBirdseye, hBirdseye,
                                            prevMatrix=warpMatrix, prevWeight=curMatrixWeight)
+
+        img, redPos = detection.detectBall(img, deskArea, 'red')
+        img, yellowPos = detection.detectBall(img, deskArea, 'yellow')
+        img, whitePos = detection.detectBall(img, deskArea, 'white')
+        ballPositions = [redPos, yellowPos, whitePos]
+        for i in range(len(ballPositions)):
+            if ballPositions[i] is not None:
+                ballPathsToDraw[i].append(np.array([list(ballPositions[i])]))
+
         warpMatrix = newMatrix
         curMatrixWeight += 1
         # now go through all the points that needs to be drawn for both windows:
@@ -103,19 +114,18 @@ while cap.isOpened():
                          originalLineColor, thickness=3)
                 utils.drawWarpedLines(originalToDraw[i], originalToDraw[i + 1], warpMatrix, imgWarp,
                                       color=originalLineColor)
+        for j, ballPathToDraw in enumerate(ballPathsToDraw):
+            if len(ballPathToDraw) >= 2:
+                for i in range(len(ballPathToDraw) - 1):
+                    cv2.line(img, utils.np2tuple(ballPathToDraw[i]), utils.np2tuple(ballPathToDraw[i + 1]),
+                             color=ballPathsColors[j], thickness=3)
+                    utils.drawWarpedLines(ballPathToDraw[i], ballPathToDraw[i + 1], warpMatrix, imgWarp,
+                                          color=ballPathsColors[j])
         cv2.imshow('Warped Table', imgWarp)
-
-
-    img, redPath = detection.detectBall(img, deskArea, 'red')
-    img, yellowPath = detection.detectBall(img, deskArea, 'yellow')
-    img, whitePath = detection.detectBall(img, deskArea, 'white')
-    # originalToDraw.append(redPath)
-
-    img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 
     cv2.imshow('Original', img)
 
-    k = cv2.waitKey(25) or 0xff
+    k = cv2.waitKey(1) or 0xff
     if k == ord('q') or k == 27:
         break
     elif k == ord('p') or k == 32:  # pause/play the video
@@ -136,6 +146,9 @@ while cap.isOpened():
         originalToDraw.clear()
     elif k == ord('v'):
         birdseyeToDraw.clear()
+    elif k == ord('b'):
+        for ballPath in ballPathsToDraw:
+            ballPath.clear()
 
 cap.release()
 cv2.destroyAllWindows()
