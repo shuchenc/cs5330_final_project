@@ -6,7 +6,7 @@ path = 'test-1.png'
 # path = 'greenball.png'
 
 # 初始化追踪点的列表
-mybuffer = 8
+mybuffer = 16
 
 # 设定阈值，HSV空间
 balls = {
@@ -15,7 +15,7 @@ balls = {
     'yellow': {'range': [np.array([18, 109, 0]), np.array([40, 255, 254])], 'pts': deque(maxlen=mybuffer)},
     'white': {'range': [np.array([18, 0, 0]), np.array([120, 117, 255])], 'pts': deque(maxlen=mybuffer)},
     # following colors not working, too much noisy
-    'green': {'range': [np.array([29, 86, 6]), np.array([64, 255, 255])], 'pts': deque(maxlen=mybuffer)},
+    'green': {'range': [np.array([70, 100, 36]), np.array([96, 255, 255])], 'pts': deque(maxlen=mybuffer)},
     'blue': {'range': [np.array([107, 174, 0]), np.array([135, 255, 84])], 'pts': deque(maxlen=mybuffer)},
     'pink': {'range': [np.array([114, 36, 148]), np.array([179, 149, 255])], 'pts': deque(maxlen=mybuffer)},
 }
@@ -35,7 +35,7 @@ def detectBalls(img, deskArea, color='red'):
     print(circles)
 
 
-def detectBall(frame, deskArea, color='red'):
+def detectBall(frame, deskArea, color='red', showMask = False):
     # color space
     blurred = cv2.GaussianBlur(frame, (5, 5), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
@@ -57,7 +57,8 @@ def detectBall(frame, deskArea, color='red'):
                        [bl[0], bl[1]], [0, height]
                        ])
     cv2.fillPoly(mask, [bgArea], (0, 0, 0))
-    cv2.imshow('mask', mask)
+    if showMask:
+        cv2.imshow('mask', mask)
 
     # output = cv2.bitwise_and(frame, frame, mask=mask)
     # cv2.imshow('output', output)

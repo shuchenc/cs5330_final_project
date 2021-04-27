@@ -9,7 +9,10 @@ path = 'sampleTable.jpg'
 path = 'youtube_game.png'
 # cap = cv2.VideoCapture('all-balls.mp4')
 # cap = cv2.VideoCapture('red_ball_1.mp4')
+# cap = cv2.VideoCapture('red_yellow_up_down_table.mp4')
 cap = cv2.VideoCapture('drill_fast.mp4')
+
+# cap = cv2.VideoCapture('whilte_red_yellow_2.mp4')
 
 cap.set(3, 608)  # set width
 cap.set(4, 1080)  # set height
@@ -27,6 +30,8 @@ curMatrixWeight = 0
 birdseyeToDraw = []
 originalToDraw = []
 toDrawLists = [originalToDraw, birdseyeToDraw]
+
+birdseyePoints = []
 
 birdseyeLineColor = (0, 200, 200)
 originalLineColor = (200, 200, 0)
@@ -71,7 +76,6 @@ while cap.isOpened():
         print("Can't receive frame. Exiting...")
         break
 
-
     frame_counter += 1
     # If the last frame is reached, reset the capture and the frame_counter
     if frame_counter == cap.get(cv2.CAP_PROP_FRAME_COUNT):
@@ -93,25 +97,28 @@ while cap.isOpened():
         # now go through all the points that needs to be drawn for both windows:
         if len(birdseyeToDraw) >= 2:
             for i in range(len(birdseyeToDraw) - 1):
-                cv2.line(imgWarp, utils.np2tuple(birdseyeToDraw[i]), utils.np2tuple(birdseyeToDraw[i+1]),
+                cv2.line(imgWarp, utils.np2tuple(birdseyeToDraw[i]), utils.np2tuple(birdseyeToDraw[i + 1]),
                          birdseyeLineColor)
                 utils.drawWarpedLines(birdseyeToDraw[i], birdseyeToDraw[i + 1],
                                       np.linalg.inv(warpMatrix), img, color=birdseyeLineColor, thickness=3)
         if len(originalToDraw) >= 2:
             for i in range(len(originalToDraw) - 1):
-                cv2.line(img, utils.np2tuple(originalToDraw[i]), utils.np2tuple(originalToDraw[i+1]),
+                cv2.line(img, utils.np2tuple(originalToDraw[i]), utils.np2tuple(originalToDraw[i + 1]),
                          originalLineColor, thickness=3)
                 utils.drawWarpedLines(originalToDraw[i], originalToDraw[i + 1], warpMatrix, imgWarp,
                                       color=originalLineColor)
         cv2.imshow('Warped Table', imgWarp)
 
-
     img, redPath = detection.detectBall(img, deskArea, 'red')
     img, yellowPath = detection.detectBall(img, deskArea, 'yellow')
     img, whitePath = detection.detectBall(img, deskArea, 'white')
-    # originalToDraw.append(redPath)
+    img, greenPath = detection.detectBall(img, deskArea, 'green')
+    # birdseyePoints.append(yellowPath)
+    # if len(birdseyePoints) >= 2:
+    #     for i in range(len(birdseyePoints) - 1):
+    #         cv2.line(img, birdseyePoints[i], birdseyePoints[i + 1], birdseyeLineColor)
 
-    img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
+    # img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 
     cv2.imshow('Original', img)
 
@@ -139,5 +146,3 @@ while cap.isOpened():
 
 cap.release()
 cv2.destroyAllWindows()
-
-
