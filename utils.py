@@ -80,7 +80,7 @@ def getContours(img, cThr=(100, 300), showCanny=False, minArea=1000, draw=False)
             #     prevP = np2tuple(con[2])
             #     cv2.drawMarker(img, curP, (0, 200, 0), markerType=cv2.MARKER_TRIANGLE_DOWN)
             #     cv2.line(img, curP, prevP, (0, 255, 0), thickness=3)
-            cv2.polylines(img, [con[2]], True, (0, 255, 0), thickness=3)
+            cv2.polylines(img, [con[2]], True, (0, 255, 0), thickness=2)
             # # draw hull points
             # for p in con[5]:
             #     cv2.drawMarker(img, (p[0, 0], p[0, 1]), (20, 200, 200), markerType=cv2.MARKER_TILTED_CROSS)

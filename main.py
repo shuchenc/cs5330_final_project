@@ -3,8 +3,8 @@ import numpy as np
 import utils
 
 stream = True
-path = 'youtube_game.png'
-cap = cv2.VideoCapture('drill_fast.mp4')
+path = 'sampleTable.jpg'
+cap = cv2.VideoCapture('red_yellow_up_down_table.mp4')
 cap.set(3, 608)  # set width
 cap.set(4, 1080)  # set height
 wTable = 54  # inches
@@ -50,6 +50,8 @@ cv2.setMouseCallback('Original', printXY, param=0)
 cv2.namedWindow('Warped Table')
 cv2.setMouseCallback('Warped Table', printXY, param=1)
 
+debugMode = False
+
 while cap.isOpened():
     if stream:
         success, img = cap.read()
@@ -62,7 +64,7 @@ while cap.isOpened():
         break
 
     img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
-    img, contours = utils.getContours(img, showCanny=True, draw=True)
+    img, contours = utils.getContours(img, showCanny=debugMode, draw=debugMode)
     if len(contours) != 0:
         contourMax = contours[0]
         approxCorners = contourMax[2]
@@ -102,6 +104,12 @@ while cap.isOpened():
         cv2.waitKey(-1)  # wait until any key is pressed
     elif k == ord('a'):
         print(mouseX, mouseY)
+    elif k == ord('d'):
+        debugMode = not debugMode
+    elif k == ord('c'):
+        originalToDraw.clear()
+    elif k == ord('v'):
+        birdseyeToDraw.clear()
 
 cap.release()
 cv2.destroyAllWindows()
