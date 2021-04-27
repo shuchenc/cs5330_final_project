@@ -7,10 +7,10 @@ stream = True
 
 path = 'sampleTable.jpg'
 # path = 'youtube_game.png'
-# cap = cv2.VideoCapture('all-balls.mp4')
+cap = cv2.VideoCapture('four_colors_1.mp4')
 # cap = cv2.VideoCapture('red_ball_1.mp4')
 # cap = cv2.VideoCapture('white_red_yellow_1.mp4')
-cap = cv2.VideoCapture('four_colors_1.mp4')
+# cap = cv2.VideoCapture('drill_fast.mp4')
 
 
 wCap, hCap = 608, 1080

@@ -14,8 +14,8 @@ balls = {
     'red': {'range': [np.array([150, 150, 50]), np.array([180, 255, 180])], 'pts': deque(maxlen=mybuffer)},
     'yellow': {'range': [np.array([18, 109, 0]), np.array([40, 255, 254])], 'pts': deque(maxlen=mybuffer)},
     'white': {'range': [np.array([18, 0, 0]), np.array([120, 117, 255])], 'pts': deque(maxlen=mybuffer)},
-    # following colors not working, too much noisy
     'green': {'range': [np.array([75, 100, 36]), np.array([96, 255, 255])], 'pts': deque(maxlen=mybuffer)},
+    # following colors not working, too much noisy
     'blue': {'range': [np.array([107, 174, 0]), np.array([135, 255, 84])], 'pts': deque(maxlen=mybuffer)},
     'pink': {'range': [np.array([114, 36, 148]), np.array([179, 149, 255])], 'pts': deque(maxlen=mybuffer)},
 }
@@ -111,14 +111,3 @@ def detectBall(frame, deskArea, color='red', showMask=False):
 
     return frame, center
 
-
-# Load in image
-# image = cv2.imread('test-1.png')
-# detectDesk(image)
-# while 1:
-#     # detectDesk(image)
-#     # Wait longer to prevent freeze for videos.
-#     if cv2.waitKey(2) & 0xFF == ord('q'):
-#         break
-#
-# cv2.destroyAllWindows()
