@@ -1,12 +1,19 @@
 import cv2
 import numpy as np
 import utils
+import detection
 
 stream = True
+
 path = 'sampleTable.jpg'
-cap = cv2.VideoCapture('red_yellow_up_down_table.mp4')
+path = 'youtube_game.png'
+# cap = cv2.VideoCapture('all-balls.mp4')
+# cap = cv2.VideoCapture('red_ball_1.mp4')
+cap = cv2.VideoCapture('drill_fast.mp4')
+
 cap.set(3, 608)  # set width
 cap.set(4, 1080)  # set height
+
 wTable = 54  # inches
 hTable = 108  # inches
 scale = 4
@@ -50,6 +57,7 @@ cv2.setMouseCallback('Original', printXY, param=0)
 cv2.namedWindow('Warped Table')
 cv2.setMouseCallback('Warped Table', printXY, param=1)
 
+frame_counter = 0
 debugMode = False
 
 while cap.isOpened():
@@ -63,11 +71,21 @@ while cap.isOpened():
         print("Can't receive frame. Exiting...")
         break
 
+
+    frame_counter += 1
+    # If the last frame is reached, reset the capture and the frame_counter
+    if frame_counter == cap.get(cv2.CAP_PROP_FRAME_COUNT):
+        frame_counter = 0  # Or whatever as long as it is the same as next line
+        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
+    deskArea = None
     img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
     img, contours = utils.getContours(img, showCanny=debugMode, draw=debugMode)
+
     if len(contours) != 0:
         contourMax = contours[0]
         approxCorners = contourMax[2]
+        deskArea = approxCorners
         imgWarp, newMatrix = utils.warpImg(img, approxCorners, wBirdseye, hBirdseye,
                                            prevMatrix=warpMatrix, prevWeight=curMatrixWeight)
         warpMatrix = newMatrix
@@ -86,6 +104,14 @@ while cap.isOpened():
                 utils.drawWarpedLines(originalToDraw[i], originalToDraw[i + 1], warpMatrix, imgWarp,
                                       color=originalLineColor)
         cv2.imshow('Warped Table', imgWarp)
+
+
+    img, redPath = detection.detectBall(img, deskArea, 'red')
+    img, yellowPath = detection.detectBall(img, deskArea, 'yellow')
+    img, whitePath = detection.detectBall(img, deskArea, 'white')
+    # originalToDraw.append(redPath)
+
+    img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 
     cv2.imshow('Original', img)
 
