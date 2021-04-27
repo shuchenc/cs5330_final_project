@@ -10,6 +10,7 @@ path = 'youtube_game.png'
 # cap = cv2.VideoCapture('all-balls.mp4')
 # cap = cv2.VideoCapture('red_ball_1.mp4')
 cap = cv2.VideoCapture('drill_fast.mp4')
+
 cap.set(3, 608)  # set width
 cap.set(4, 1080)  # set height
 
@@ -57,6 +58,8 @@ cv2.namedWindow('Warped Table')
 cv2.setMouseCallback('Warped Table', printXY, param=1)
 
 frame_counter = 0
+debugMode = False
+
 while cap.isOpened():
     if stream:
         success, img = cap.read()
@@ -77,8 +80,8 @@ while cap.isOpened():
 
     deskArea = None
     img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
+    img, contours = utils.getContours(img, showCanny=debugMode, draw=debugMode)
 
-    img, contours = utils.getContours(img, showCanny=True, draw=True)
     if len(contours) != 0:
         contourMax = contours[0]
         approxCorners = contourMax[2]
@@ -127,6 +130,12 @@ while cap.isOpened():
         cv2.waitKey(-1)  # wait until any key is pressed
     elif k == ord('a'):
         print(mouseX, mouseY)
+    elif k == ord('d'):
+        debugMode = not debugMode
+    elif k == ord('c'):
+        originalToDraw.clear()
+    elif k == ord('v'):
+        birdseyeToDraw.clear()
 
 cap.release()
 cv2.destroyAllWindows()
