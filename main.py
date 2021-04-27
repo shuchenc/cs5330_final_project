@@ -75,13 +75,14 @@ while cap.isOpened():
         frame_counter = 0  # Or whatever as long as it is the same as next line
         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-
+    deskArea = None
     img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 
     img, contours = utils.getContours(img, showCanny=True, draw=True)
     if len(contours) != 0:
         contourMax = contours[0]
         approxCorners = contourMax[2]
+        deskArea = approxCorners
         imgWarp, newMatrix = utils.warpImg(img, approxCorners, wBirdseye, hBirdseye,
                                            prevMatrix=warpMatrix, prevWeight=curMatrixWeight)
         warpMatrix = newMatrix
@@ -101,11 +102,13 @@ while cap.isOpened():
                                       color=originalLineColor)
         cv2.imshow('Warped Table', imgWarp)
 
-    img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 
-    img = detection.detectBall(img, 'red')
-    img = detection.detectBall(img, 'yellow')
-    # img = detection.detectBall(img, 'desk')
+    img, redPath = detection.detectBall(img, deskArea, 'red')
+    img, yellowPath = detection.detectBall(img, deskArea, 'yellow')
+    img, whitePath = detection.detectBall(img, deskArea, 'white')
+    # originalToDraw.append(redPath)
+
+    img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 
     cv2.imshow('Original', img)
 
