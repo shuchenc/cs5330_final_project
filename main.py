@@ -34,8 +34,8 @@ while cap.isOpened():
         curWeight += 1
         cv2.imshow('Warped Table', imgWarp)
 
-    cv2.imshow('Original', img)
     img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
+    cv2.imshow('Original', img)
 
     k = cv2.waitKey(25) or 0xff
     if k == ord('q') or k == 27:
