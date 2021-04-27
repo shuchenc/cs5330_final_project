@@ -2,15 +2,17 @@ import cv2
 import numpy as np
 import utils
 import detection
+from collections import deque
+mybuffer = 32
 
 stream = True
 
 path = 'sampleTable.jpg'
 path = 'youtube_game.png'
 # cap = cv2.VideoCapture('all-balls.mp4')
-# cap = cv2.VideoCapture('red_ball_1.mp4')
+cap = cv2.VideoCapture('white_red_yellow_2.mp4')
 # cap = cv2.VideoCapture('red_yellow_up_down_table.mp4')
-cap = cv2.VideoCapture('drill_fast.mp4')
+# cap = cv2.VideoCapture('drill_fast.mp4')
 
 # cap = cv2.VideoCapture('whilte_red_yellow_2.mp4')
 
@@ -31,7 +33,9 @@ birdseyeToDraw = []
 originalToDraw = []
 toDrawLists = [originalToDraw, birdseyeToDraw]
 
-birdseyePoints = []
+# tracking points
+birdseyePointList = []
+birdseyePoints = deque(maxlen=mybuffer)
 
 birdseyeLineColor = (0, 200, 200)
 originalLineColor = (200, 200, 0)
@@ -81,6 +85,8 @@ while cap.isOpened():
     if frame_counter == cap.get(cv2.CAP_PROP_FRAME_COUNT):
         frame_counter = 0  # Or whatever as long as it is the same as next line
         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        # reset tracking points
+        birdseyePointList = []
 
     deskArea = None
     img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
@@ -113,10 +119,15 @@ while cap.isOpened():
     img, yellowPath = detection.detectBall(img, deskArea, 'yellow')
     img, whitePath = detection.detectBall(img, deskArea, 'white')
     img, greenPath = detection.detectBall(img, deskArea, 'green')
-    # birdseyePoints.append(yellowPath)
-    # if len(birdseyePoints) >= 2:
-    #     for i in range(len(birdseyePoints) - 1):
-    #         cv2.line(img, birdseyePoints[i], birdseyePoints[i + 1], birdseyeLineColor)
+    if whitePath is not None:
+        birdseyePoints.appendleft(whitePath)
+        birdseyePointList.append(whitePath)
+    for i in range(3, len(birdseyePointList)):
+        # if birdseyePointList[i - 1] is None or birdseyePointList[i] is None:
+        if i < 3:
+            continue
+        if i % 3 == 0:
+            cv2.line(img, birdseyePointList[i - 3], birdseyePointList[i], birdseyeLineColor)
 
     # img = cv2.resize(img, (0, 0), None, 0.7, 0.7)
 

@@ -64,7 +64,6 @@ def detectBall(frame, deskArea, color='red', showMask = False):
     # cv2.imshow('output', output)
     # find contours in the mask and initialize the current
     # (x, y) center of the ball
-    # 轮廓检测
     cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
     # 初始化瓶盖圆形轮廓质心
     center = None
@@ -80,16 +79,15 @@ def detectBall(frame, deskArea, color='red', showMask = False):
 
         # find the largest contour in the mask, then use
         # it to compute the minimum enclosing circle and
-        # centroid
         c = max(cnts, key=cv2.contourArea)
         ((x, y), radius) = cv2.minEnclosingCircle(c)
         # only proceed if the radius meets a minimum size
         M = cv2.moments(c)
         if radius > 3 and M["m00"] > 0:
-            # 计算质心
+            # compute centroid
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
             # determine if the point is in the desk area
-            result = cv2.pointPolygonTest(deskArea, (center[0], center[1]), False)
+            # result = cv2.pointPolygonTest(deskArea, (center[0], center[1]), False)
 
             # draw the circle and centroid on the frame,
             # then update the list of tracked points
@@ -99,16 +97,17 @@ def detectBall(frame, deskArea, color='red', showMask = False):
             # update the points queue
             balls[color]['pts'].appendleft(center)
 
-        # 遍历追踪点，分段画出轨迹
+        # draw trajectory
         for i in range(1, len(balls[color]['pts'])):
             if balls[color]['pts'][i - 1] is None or balls[color]['pts'][i] is None:
                 continue
-            # 计算所画小线段的粗细
-            thickness = int(np.sqrt(mybuffer / float(i + 1)) * 2.5)
+            # compute the thickness of the line
+            thickness = int(np.sqrt(mybuffer / float(i + 1)) * 1.5)
             # thickness = 1
-            # 画出小线段
+            # draw line
             cv2.line(frame, balls[color]['pts'][i - 1], balls[color]['pts'][i], (0, 0, 255), thickness)
-
+    else:
+        balls[color]['pts'] = deque(maxlen=mybuffer)
     return frame, center
 
 
