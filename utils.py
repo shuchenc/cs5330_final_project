@@ -85,7 +85,8 @@ def getContours(img, cThr=(100, 300), showCanny=False, minArea=1000, draw=False)
             # for p in con[5]:
             #     cv2.drawMarker(img, (p[0, 0], p[0, 1]), (20, 200, 200), markerType=cv2.MARKER_TILTED_CROSS)
     if showCanny:
-        cv2.imshow('Canny', imgThresh)
+        cv2.imshow('Blue surface', imgBlue)
+        cv2.imshow('Canny after dilation and erosion', imgThresh)
     return img, finalContours
 
 
@@ -124,12 +125,12 @@ def transferPts(pts, M):
     return warpedPts
 
 
-def drawWarpedLines(pt1, pt2, M, dst, color=(0, 0, 255), thickness=2, lineType=cv2.LINE_4):
+def drawWarpedLines(pt1, pt2, M, dst, color=(0, 0, 255), thickness=2):
     [wp1, wp2] = transferPts([pt1, pt2], M)
     #print(wp1, wp2, wp1.shape, wp2.shape)
     wp1 = np2tuple(wp1)
     wp2 = np2tuple(wp2)
-    cv2.line(dst, wp1, wp2, color, thickness, lineType)
+    cv2.line(dst, wp1, wp2, color, thickness)
 
 
 def np2tuple(npPt):
