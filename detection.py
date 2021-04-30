@@ -2,13 +2,17 @@ import cv2
 import numpy as np
 from collections import deque
 
+'''
+future improvements
+computer scores based on the ball color 
+'''
 path = 'test-1.png'
 # path = 'greenball.png'
 
-# 初始化追踪点的列表
+# initial tracking point list
 mybuffer = 8
 
-# 设定阈值，HSV空间
+# set HSV Threshold and initial tracking queue for each color
 balls = {
     'desk': {'range': [np.array([97, 121, 0]), np.array([180, 255, 255])], 'pts': deque(maxlen=mybuffer)},
     'red': {'range': [np.array([150, 150, 50]), np.array([180, 255, 180])], 'pts': deque(maxlen=mybuffer)},
@@ -21,20 +25,7 @@ balls = {
 }
 
 
-def detectBalls(img, deskArea, color='red'):
-    img = cv2.medianBlur(img, 5)
-    cv2.imshow('medianblur', img)
-    diameterBall = 30
-    radiusBall = int(round(diameterBall / 2))
-    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 2 * radiusBall * 0.9,
-                               minRadius=int(round(radiusBall * 0.8)),
-                               maxRadius=int(round(radiusBall * 1.2)),
-                               param1=60,
-                               param2=20
-                               )
-    print(circles)
-
-
+# detect balls based on hsv color space
 def detectBall(frame, deskArea, color='red', showMask=False):
     # color space
     blurred = cv2.GaussianBlur(frame, (5, 5), 0)
@@ -64,9 +55,8 @@ def detectBall(frame, deskArea, color='red', showMask=False):
     # cv2.imshow('output', output)
     # find contours in the mask and initialize the current
     # (x, y) center of the ball
-    # 轮廓检测
     cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2]
-    # 初始化瓶盖圆形轮廓质心
+    # init centroid
     center = None
     # only proceed if at least one contour was found
     if len(cnts) > 0:
@@ -86,7 +76,7 @@ def detectBall(frame, deskArea, color='red', showMask=False):
         # only proceed if the radius meets a minimum size
         M = cv2.moments(c)
         if radius > 3 and M["m00"] > 0:
-            # 计算质心
+            # compute centroid
             center = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
             # determine if the point is in the desk area
             result = cv2.pointPolygonTest(deskArea, (center[0], center[1]), False)
@@ -99,15 +89,14 @@ def detectBall(frame, deskArea, color='red', showMask=False):
             # update the points queue
             balls[color]['pts'].appendleft(center)
 
-        # 遍历追踪点，分段画出轨迹
+        # draw trajectory
         for i in range(1, len(balls[color]['pts'])):
             if balls[color]['pts'][i - 1] is None or balls[color]['pts'][i] is None:
                 continue
-            # 计算所画小线段的粗细
+            # compute the thickness of the line
             thickness = int(np.sqrt(mybuffer / float(i + 1)) * 2.5)
             # thickness = 1
-            # 画出小线段
+            # draw line
             cv2.line(frame, balls[color]['pts'][i - 1], balls[color]['pts'][i], (0, 0, 255), thickness)
-
     return frame, center
 
