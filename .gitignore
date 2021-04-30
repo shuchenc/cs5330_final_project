@@ -2,3 +2,5 @@
 .idea
 *.pyc
 *.iml
+.idea/cs5330_final_project.iml
+.idea/misc.xml

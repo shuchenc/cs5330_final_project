@@ -2,6 +2,10 @@ import cv2
 import numpy as np
 from collections import deque
 
+'''
+future improvements
+computer scores based on the ball color 
+'''
 path = 'test-1.png'
 # path = 'greenball.png'
 
